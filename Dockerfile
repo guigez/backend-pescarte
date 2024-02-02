@@ -1,4 +1,5 @@
-FROM python:3.9
+FROM python:3.10-alpine
+
 
 RUN mkdir /app/
 WORKDIR /app/
@@ -9,9 +10,12 @@ ENV PYTHONPATH=/app
 COPY . .
 
 RUN \
-    apt-get update && \
-    apt-get install -y libpq-dev gcc postgresql-client && \
-    python -m pip install --upgrade pip && \
+    apk upgrade && \
+    apk add curl make build-base python3-dev libpq-dev gcc postgresql-client && \
+    curl -fsSL -o /bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64 && \
+    chmod +x /bin/dbmate
+
+RUN python -m pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
