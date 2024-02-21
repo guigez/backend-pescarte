@@ -4,7 +4,7 @@ from src.database import get_db, Session
 from fastapi import FastAPI, Depends
 from starlette.responses import JSONResponse
 
-from src.models.uf import UF
+from src.models.municipality import Municipality
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')
 
@@ -17,7 +17,7 @@ async def health_check():
 @app.post('/teste')
 async def test_endpoint(db: Session = Depends(get_db)):
 
-    new_model = UF(uf_name="São Paulo", uf="SP")
+    new_model = Municipality(name="Tietê", uf="SP")
     saved, error = new_model.save(db)
 
 
