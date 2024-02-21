@@ -1,14 +1,12 @@
 from sqlalchemy import Column, String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.declarative import declarative_base
 import uuid
 
 from src.models.base_sql_model import BaseSQLModel
+from src.database import BaseModel
 
-Base = declarative_base()
 
-
-class Fish(Base, BaseSQLModel):
+class Fish(BaseModel, BaseSQLModel):
     __tablename__ = 'fish'
 
     # Define columns
