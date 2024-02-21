@@ -6,6 +6,9 @@ import uuid
 
 from src.models.base_sql_model import BaseSQLModel
 from src.models.fish_habitat import FishHabitat
+from src.models.fish_gear import FishGear
+from src.models.habitat import Habitat
+from src.models.gear import Gear
 from src.database import BaseModel
 
 
@@ -18,3 +21,4 @@ class Fish(BaseModel, BaseSQLModel):
     native = Column(Boolean)
 
     habitats = relationship("Habitat", secondary=FishHabitat, back_populates="fishes")
+    gears = relationship("Gear", secondary=FishGear, back_populates="fishes")
