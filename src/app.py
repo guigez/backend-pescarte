@@ -4,7 +4,7 @@ from src.database import get_db, Session
 from fastapi import FastAPI, Depends
 from starlette.responses import JSONResponse
 
-from src.models.gear import Gear
+from src.models.uf import UF
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')
 
@@ -16,8 +16,11 @@ async def health_check():
 
 @app.post('/teste')
 async def test_endpoint(db: Session = Depends(get_db)):
-    new_model = Gear(name="Vara de Pescar")
+
+    new_model = UF(uf_name="São Paulo", uf="SP")
     saved, error = new_model.save(db)
+
+
     if saved:
         return new_model
     else:
