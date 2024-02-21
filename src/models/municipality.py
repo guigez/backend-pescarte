@@ -16,3 +16,4 @@ class Municipality(BaseModel, BaseSQLModel):
     uf = Column(String(255), ForeignKey('uf.uf_name'))
 
     uf_rel = relationship("UF", back_populates="municipalities")
+    communities = relationship("Community", back_populates="municipality")
