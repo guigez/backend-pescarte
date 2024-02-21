@@ -9,6 +9,7 @@ from src.models.fish import Fish
 from src.models.gear import Gear
 from src.models.habitat import Habitat
 from src.models.fish_common_name_by_community import FishCommonNameByCommunity
+from src.models.suggested_common_names import SuggestedCommonNames
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')
 
@@ -45,21 +46,22 @@ async def add_fish_with_habitats(db: Session = Depends(get_db)):
         community = Community(name="Community 1")
         community.save(db)
 
-    # Create a new common name entry
-    common_name_entry = FishCommonNameByCommunity(
-        common_name="Local Fish Name",
+    new_suggested_name = SuggestedCommonNames(
+        id="unique-id-for-this-suggestion",
+        name="John Doe",
+        email="john.doe@example.com",
+        suggested_name="Local Name for Fish",
         fish_id=new_fish.id,
         community_id=community.id
     )
+    saved, error = new_suggested_name.save(db)
 
-    db.add(common_name_entry)
-
-    try:
-        db.commit()
-        return common_name_entry
-    except Exception as e:
-        db.rollback()
+    if saved:
+        return new_suggested_name
+    else:
         return JSONResponse(
             status_code=400,
-            content={"message": str(e)}
+            content={"message": error}
         )
+
+

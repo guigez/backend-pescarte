@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 import uuid
 
 from src.models.municipality import Municipality
+from src.models.suggested_common_names import SuggestedCommonNames
 from src.models.base_sql_model import BaseSQLModel
 from src.database import BaseModel
 
@@ -19,3 +20,4 @@ class Community(BaseModel, BaseSQLModel):
     # Relationship - each Community is related to a Municipality
     municipality = relationship("Municipality", back_populates="communities")
     fish_common_names = relationship("FishCommonNameByCommunity", back_populates="community")
+    suggested_names = relationship("SuggestedCommonNames", back_populates="community")
