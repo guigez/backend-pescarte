@@ -4,7 +4,7 @@ from src.database import get_db, Session
 from fastapi import FastAPI, Depends
 from starlette.responses import JSONResponse
 
-from src.models.fish import Fish
+from src.models.gear import Gear
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')
 
@@ -16,10 +16,10 @@ async def health_check():
 
 @app.post('/teste')
 async def test_endpoint(db: Session = Depends(get_db)):
-    fish_model = Fish(scientific_name="Salmo salar", native=True)
-    saved, error = fish_model.save(db)
+    new_model = Gear(name="Vara de Pescar")
+    saved, error = new_model.save(db)
     if saved:
-        return fish_model
+        return new_model
     else:
         return JSONResponse(
             status_code=400,
