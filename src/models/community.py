@@ -18,3 +18,4 @@ class Community(BaseModel, BaseSQLModel):
 
     # Relationship - each Community is related to a Municipality
     municipality = relationship("Municipality", back_populates="communities")
+    fish_common_names = relationship("FishCommonNameByCommunity", back_populates="community")

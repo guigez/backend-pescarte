@@ -8,6 +8,7 @@ from src.models.community import Community
 from src.models.fish import Fish
 from src.models.gear import Gear
 from src.models.habitat import Habitat
+from src.models.fish_common_name_by_community import FishCommonNameByCommunity
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')
 
@@ -38,23 +39,24 @@ async def add_fish_with_habitats(db: Session = Depends(get_db)):
     # Create new fish
     new_fish = db.query(Fish).filter(Fish.scientific_name == "Salmo salar2").first()
 
-    # Assuming gear exists, fetch them by ID or name, or create new ones
-    gear1 = db.query(Gear).filter(Gear.name == "Net").first()
-    if not gear1:
-        gear1 = Gear(name="Net")
-        db.add(gear1)
+    # Fetch or create the community
+    community = db.query(Community).filter(Community.name == "Community 1").first()
+    if not community:
+        community = Community(name="Community 1")
+        community.save(db)
 
-    gear2 = db.query(Gear).filter(Gear.name == "Rod").first()
-    if not gear2:
-        gear2 = Gear(name="Rod")
-        db.add(gear2)
+    # Create a new common name entry
+    common_name_entry = FishCommonNameByCommunity(
+        common_name="Local Fish Name",
+        fish_id=new_fish.id,
+        community_id=community.id
+    )
 
-    # Add gear to the fish
-    new_fish.gears.extend([gear1, gear2])
+    db.add(common_name_entry)
 
     try:
         db.commit()
-        return new_fish
+        return common_name_entry
     except Exception as e:
         db.rollback()
         return JSONResponse(
