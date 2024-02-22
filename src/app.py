@@ -1,9 +1,9 @@
-from typing import List
+from typing import List, Optional
 
 from src.database import get_db, Session
 
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Query
 from starlette.responses import JSONResponse
 
 from src.models.community import Community
@@ -11,7 +11,7 @@ from src.models.fish import Fish
 from src.models.gear import Gear
 from src.models.habitat import Habitat
 from src.models.fish_common_name_by_community import FishCommonNameByCommunity
-from src.models.suggested_common_names import SuggestedCommonNames
+from src.models.suggested_common_names import SuggestedCommonNames, SuggestedCommonNameStatus
 from src.schemas import SuggestCommonNameBody, SuggestedCommonNameResponse
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')
@@ -23,10 +23,18 @@ async def health_check():
 
 
 @app.get('/suggested-common-names', response_model=List[SuggestedCommonNameResponse])
-async def get_suggested_common_names(db: Session = Depends(get_db)):
+async def get_suggested_common_names(
+        db: Session = Depends(get_db),
+        status: Optional[SuggestedCommonNameStatus] = Query(None)
+):
     # Query the database for all suggested common names
-    suggested_names = db.query(SuggestedCommonNames).all()
+    if status:
+        suggested_names = db.query(SuggestedCommonNames).filter(SuggestedCommonNames.status == status.value).all()
+    else:
+        # Get all suggested names if no status filter is provided
+        suggested_names = db.query(SuggestedCommonNames).all()
     return suggested_names
+
 
 @app.post('/suggested-common-names')
 async def suggest_common_name(
