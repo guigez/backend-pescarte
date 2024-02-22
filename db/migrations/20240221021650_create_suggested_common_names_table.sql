@@ -10,7 +10,7 @@ END$$;
 
 -- Create suggested_common_names table
 CREATE TABLE suggested_common_names (
-    id VARCHAR(255) PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255),
     suggested_name VARCHAR(255),

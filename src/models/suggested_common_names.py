@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import Column, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
@@ -17,7 +19,7 @@ class SuggestedCommonNameStatus(enum.Enum):
 class SuggestedCommonNames(BaseModel, BaseSQLModel):
     __tablename__ = 'suggested_common_names'
 
-    id = Column(String(255), primary_key=True)
+    id = Column(String(255), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
     email = Column(String(255))
     suggested_name = Column(String(255))

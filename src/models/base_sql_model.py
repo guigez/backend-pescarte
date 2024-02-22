@@ -20,6 +20,7 @@ class BaseSQLModel:
         try:
             db.add(self)
             db.commit()
+            db.refresh(self)
             return True, None
         except SQLAlchemyError as error:
             print(error)
