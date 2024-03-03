@@ -1,14 +1,10 @@
 from typing import List, Optional
 
-from src.database import get_db, Session
-
-
 from fastapi import FastAPI, Depends, Query
 from starlette.responses import JSONResponse
 
-from src.models.community import Community
-
-from src.models import SuggestedCommonNames
+from src.database import get_db, Session
+from src.models import SuggestedCommonNames, UF, Municipality, Community
 from src.models.suggested_common_names import SuggestedCommonNameStatus
 from src.schemas import SuggestCommonNameBody, SuggestedCommonNameResponse
 
@@ -25,11 +21,9 @@ async def get_suggested_common_names(
         db: Session = Depends(get_db),
         status: Optional[SuggestedCommonNameStatus] = Query(None)
 ):
-    # Query the database for all suggested common names
     if status:
         suggested_names = db.query(SuggestedCommonNames).filter(SuggestedCommonNames.status == status.value).all()
     else:
-        # Get all suggested names if no status filter is provided
         suggested_names = db.query(SuggestedCommonNames).all()
     return suggested_names
 
@@ -63,3 +57,20 @@ async def suggest_common_name(
             content={"message": "Error while saving task",
                      "detail": error}
         )
+
+
+@app.get('/uf')
+async def get_states(
+        db: Session = Depends(get_db)
+):
+    states = db.query(UF).all()
+    return states
+
+
+@app.get('/cities')
+async def get_cities(
+        db: Session = Depends(get_db),
+        uf: str = Query()
+):
+    cities = db.query(Municipality).filter(Municipality.uf == uf).all()
+    return cities
