@@ -1,10 +1,9 @@
+import uuid
+
 from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-import uuid
 
-from src.models.municipality import Municipality
-from src.models.suggested_common_names import SuggestedCommonNames
 from src.models.base_sql_model import BaseSQLModel
 from src.database import BaseModel
 

@@ -1,7 +1,8 @@
+import uuid
+
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-import uuid
 
 from src.models.base_sql_model import BaseSQLModel
 from src.models.fish_gear import FishGear

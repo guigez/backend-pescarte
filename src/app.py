@@ -7,11 +7,9 @@ from fastapi import FastAPI, Depends, Query
 from starlette.responses import JSONResponse
 
 from src.models.community import Community
-from src.models.fish import Fish
-from src.models.gear import Gear
-from src.models.habitat import Habitat
-from src.models.fish_common_name_by_community import FishCommonNameByCommunity
-from src.models.suggested_common_names import SuggestedCommonNames, SuggestedCommonNameStatus
+
+from src.models import SuggestedCommonNames
+from src.models.suggested_common_names import SuggestedCommonNameStatus
 from src.schemas import SuggestCommonNameBody, SuggestedCommonNameResponse
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')

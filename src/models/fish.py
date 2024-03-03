@@ -1,16 +1,12 @@
+import uuid
+
 from sqlalchemy import Column, String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-import uuid
-
 from src.models.base_sql_model import BaseSQLModel
 from src.models.fish_habitat import FishHabitat
 from src.models.fish_gear import FishGear
-from src.models.fish_common_name_by_community import FishCommonNameByCommunity
-from src.models.suggested_common_names import SuggestedCommonNames
-from src.models.habitat import Habitat
-from src.models.gear import Gear
 from src.database import BaseModel
 
 
