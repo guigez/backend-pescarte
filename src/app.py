@@ -6,7 +6,7 @@ from starlette.responses import JSONResponse
 from src.database import get_db, Session
 from src.models import SuggestedCommonNames, UF, Municipality, Community
 from src.models.suggested_common_names import SuggestedCommonNameStatus
-from src.schemas import SuggestCommonNameBody, SuggestedCommonNameResponse
+from src.schemas import SuggestCommonNameBody, SuggestedCommonNameResponse, UFSchema, CitySchema
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')
 
@@ -59,7 +59,7 @@ async def suggest_common_name(
         )
 
 
-@app.get('/uf')
+@app.get('/uf', response_model=List[UFSchema])
 async def get_states(
         db: Session = Depends(get_db)
 ):
@@ -67,7 +67,7 @@ async def get_states(
     return states
 
 
-@app.get('/cities')
+@app.get('/cities', response_model=List[CitySchema])
 async def get_cities(
         db: Session = Depends(get_db),
         uf: str = Query()
