@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 import uuid
 
 from src.models.base_sql_model import BaseSQLModel
-from src.models.fish_habitat import FishHabitat
+from src.models import FishHabitat
 from src.database import BaseModel
 
 
