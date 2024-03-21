@@ -6,9 +6,12 @@ from starlette.responses import JSONResponse
 from src.database import get_db, Session
 from src.models import SuggestedCommonNames, UF, Municipality, Community
 from src.models.suggested_common_names import SuggestedCommonNameStatus
+from src.routes.gear import router as gear_router
 from src.schemas import SuggestCommonNameBody, SuggestedCommonNameResponse, UFSchema, CitySchema
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')
+
+app.include_router(gear_router, tags=["Gear"])
 
 
 @app.get('/healthcheck')
