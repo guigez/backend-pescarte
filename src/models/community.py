@@ -1,11 +1,12 @@
 import uuid
+from typing import List
 
 from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from src.models.base_sql_model import BaseSQLModel
-from src.database import BaseModel
+from src.database import BaseModel, Session
 
 
 class Community(BaseModel, BaseSQLModel):
@@ -20,3 +21,11 @@ class Community(BaseModel, BaseSQLModel):
     municipality = relationship("Municipality", back_populates="communities")
     fish_common_names = relationship("FishCommonNameByCommunity", back_populates="community")
     suggested_names = relationship("SuggestedCommonNames", back_populates="community")
+
+    @classmethod
+    def get_all(cls, db: Session) -> List["Community"]:
+        return db.query(cls).all()
+
+    @classmethod
+    def get_by_id(cls, db: Session, gear_id: UUID) -> "Community":
+        return db.query(cls).filter_by(id=gear_id).first()

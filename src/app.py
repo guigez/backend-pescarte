@@ -7,17 +7,19 @@ from src.database import get_db, Session
 from src.models import SuggestedCommonNames, UF, Municipality, Community
 from src.models.suggested_common_names import SuggestedCommonNameStatus
 from src.routes.gear import router as gear_router
+from src.routes.community import router as community_router
+
 from src.schemas import SuggestCommonNameBody, SuggestedCommonNameResponse, UFSchema, CitySchema
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')
 
 app.include_router(gear_router, tags=["Gear"])
+app.include_router(community_router, tags=["Community"])
 
 
 @app.get('/healthcheck')
 async def health_check():
     return {"message": "Up and running"}
-
 
 @app.get('/suggested-common-names', response_model=List[SuggestedCommonNameResponse])
 async def get_suggested_common_names(
