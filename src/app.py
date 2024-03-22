@@ -4,24 +4,28 @@ from fastapi import FastAPI, Depends, Query
 from starlette.responses import JSONResponse
 
 from src.database import get_db, Session
-from src.models import SuggestedCommonNames, UF, Municipality, Community
+from src.models import SuggestedCommonNames, Community
 from src.models.suggested_common_names import SuggestedCommonNameStatus
+
 from src.routes.gear import router as gear_router
 from src.routes.community import router as community_router
 from src.routes.habitat import router as habitat_router
+from src.routes.lookup import router as lookup_router
 
-from src.schemas import SuggestCommonNameBody, SuggestedCommonNameResponse, UFSchema, CitySchema
+from src.schemas import SuggestCommonNameBody, SuggestedCommonNameResponse
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')
 
 app.include_router(gear_router, tags=["Gear"])
 app.include_router(community_router, tags=["Community"])
 app.include_router(habitat_router, tags=["Habitat"])
+app.include_router(lookup_router, tags=["Lookups"])
 
 
 @app.get('/healthcheck')
 async def health_check():
     return {"message": "Up and running"}
+
 
 @app.get('/suggested-common-names', response_model=List[SuggestedCommonNameResponse])
 async def get_suggested_common_names(
@@ -64,20 +68,3 @@ async def suggest_common_name(
             content={"message": "Error while saving task",
                      "detail": error}
         )
-
-
-@app.get('/uf', response_model=List[UFSchema])
-async def get_states(
-        db: Session = Depends(get_db)
-):
-    states = db.query(UF).all()
-    return states
-
-
-@app.get('/cities', response_model=List[CitySchema])
-async def get_cities(
-        db: Session = Depends(get_db),
-        uf: str = Query()
-):
-    cities = db.query(Municipality).filter(Municipality.uf == uf).all()
-    return cities
