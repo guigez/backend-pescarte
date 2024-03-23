@@ -2,6 +2,10 @@ from pydantic import BaseModel, UUID4, validator
 import enum
 
 
+class ErrorMessage(BaseModel):
+    message: str
+
+
 class SuggestCommonNameBody(BaseModel):
     name: str
     email: str

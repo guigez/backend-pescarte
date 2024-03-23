@@ -12,7 +12,7 @@ class BaseSQLModel:
             for attr, value in update_args.items():
                 setattr(self, attr, value)
             db.commit()
-            return True, None
+            return self, None
         except SQLAlchemyError as error:
             return False, ''.join(error.args)
 
@@ -21,7 +21,7 @@ class BaseSQLModel:
             db.add(self)
             db.commit()
             db.refresh(self)
-            return True, None
+            return self, None
         except SQLAlchemyError as error:
             print(error)
             return False, ''.join(error.args)

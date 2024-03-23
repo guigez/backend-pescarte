@@ -1,21 +1,23 @@
 from uuid import UUID
+from typing import List
 
 from fastapi import APIRouter, Depends
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 from src.database import get_db, Session
 from src.models import Gear
-from src.schemas.gear import GearInput
+from src.schemas import ErrorMessage
+from src.schemas.gear import GearInput, GearOutput
 
 router = APIRouter(prefix='/gear')
 
 
-@router.get('/')
+@router.get('/', response_model=List[GearOutput])
 async def get_all_gears(db: Session = Depends(get_db)):
     return Gear.get_all(db)
 
 
-@router.get('/{gear_id}')
+@router.get('/{gear_id}', response_model=GearOutput, responses={404: {'model': ErrorMessage}})
 async def get_gear(
         gear_id: UUID,
         db: Session = Depends(get_db)
@@ -30,7 +32,7 @@ async def get_gear(
         )
 
 
-@router.post('/')
+@router.post('/', response_model=GearOutput)
 async def create_gear(
         gear: GearInput,
         db: Session = Depends(get_db)
@@ -39,7 +41,7 @@ async def create_gear(
     saved, error = gear_model.save(db)
 
     if saved:
-        return gear_model
+        return saved
     else:
         return JSONResponse(
             status_code=500,
@@ -48,7 +50,7 @@ async def create_gear(
         )
 
 
-@router.patch('/{gear_id}')
+@router.patch('/{gear_id}', response_model=GearOutput, responses={404: {'model': ErrorMessage}})
 async def update_gear(
         gear_id: UUID,
         gear_payload: GearInput,
@@ -59,13 +61,13 @@ async def update_gear(
     if not gear:
         return JSONResponse(
             status_code=404,
-            content={"message": "gear not found"}
+            content={"message": "Gear not found"}
         )
 
     updated, error = gear.update(db, gear_payload.dict(exclude_none=True))
 
     if updated:
-        return {"message": "Gear updated"}
+        return updated
     else:
         return JSONResponse(
             status_code=500,
@@ -74,11 +76,12 @@ async def update_gear(
         )
 
 
-@router.delete('/{gear_id}')
+@router.delete('/{gear_id}', status_code=204, response_class=Response, responses={404: {'model': ErrorMessage}})
 async def delete_gear(
         gear_id: UUID,
         db: Session = Depends(get_db)
 ):
+    # TODO: Found which type should I define as the return
     gear = Gear.get_by_id(db, gear_id)
 
     if not gear:
@@ -90,7 +93,7 @@ async def delete_gear(
     deleted, error = gear.delete(db)
 
     if deleted:
-        return {"message": "Gear deleted"}
+        return None
     else:
         return JSONResponse(
             status_code=500,

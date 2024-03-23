@@ -1,21 +1,23 @@
 from uuid import UUID
+from typing import List
 
 from fastapi import APIRouter, Depends
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 from src.database import get_db, Session
 from src.models import Community
-from src.schemas.community import CommunityInput, CommunityPatchInput
+from src.schemas import ErrorMessage
+from src.schemas.community import CommunityInput, CommunityPatchInput, CommunityOutput
 
 router = APIRouter(prefix='/community')
 
 
-@router.get('/')
+@router.get('/', response_model=List[CommunityOutput])
 async def get_all_communities(db: Session = Depends(get_db)):
     return Community.get_all(db)
 
 
-@router.get('/{community_id}')
+@router.get('/{community_id}', response_model=CommunityOutput, responses={404: {'model': ErrorMessage}})
 async def get_community(
         community_id: UUID,
         db: Session = Depends(get_db)
@@ -30,7 +32,7 @@ async def get_community(
         )
 
 
-@router.post('/')
+@router.post('/', response_model=CommunityOutput)
 async def create_community(
         community: CommunityInput,
         db: Session = Depends(get_db)
@@ -39,7 +41,7 @@ async def create_community(
     saved, error = community_model.save(db)
 
     if saved:
-        return community_model
+        return saved
     else:
         return JSONResponse(
             status_code=500,
@@ -48,7 +50,7 @@ async def create_community(
         )
 
 
-@router.patch('/{community_id}')
+@router.patch('/{community_id}', response_model=CommunityOutput, responses={404: {'model': ErrorMessage}})
 async def update_community(
         community_id: UUID,
         community_payload: CommunityPatchInput,
@@ -65,7 +67,7 @@ async def update_community(
     updated, error = community.update(db, community_payload.dict(exclude_none=True))
 
     if updated:
-        return {"message": "Community updated"}
+        return updated
     else:
         return JSONResponse(
             status_code=500,
@@ -74,7 +76,7 @@ async def update_community(
         )
 
 
-@router.delete('/{community_id}')
+@router.delete('/{community_id}', status_code=204, response_class=Response, responses={404: {'model': ErrorMessage}})
 async def delete_community(
         community_id: UUID,
         db: Session = Depends(get_db)
@@ -90,7 +92,7 @@ async def delete_community(
     deleted, error = community.delete(db)
 
     if deleted:
-        return {"message": "Community deleted"}
+        return None
     else:
         return JSONResponse(
             status_code=500,

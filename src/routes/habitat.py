@@ -1,21 +1,23 @@
 from uuid import UUID
+from typing import List
 
 from fastapi import APIRouter, Depends
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 from src.database import get_db, Session
 from src.models import Habitat
-from src.schemas.habitat import HabitatInput
+from src.schemas import ErrorMessage
+from src.schemas.habitat import HabitatInput, HabitatOutput
 
 router = APIRouter(prefix='/habitat')
 
 
-@router.get('/')
+@router.get('/', response_model=List[HabitatOutput])
 async def get_all_habitats(db: Session = Depends(get_db)):
     return Habitat.get_all(db)
 
 
-@router.get('/{habitat_id}')
+@router.get('/{habitat_id}', response_model=HabitatOutput, responses={404: {'model': ErrorMessage}})
 async def get_habitat(
         habitat_id: UUID,
         db: Session = Depends(get_db)
@@ -30,7 +32,7 @@ async def get_habitat(
         )
 
 
-@router.post('/')
+@router.post('/', response_model=HabitatOutput)
 async def create_habitat(
         habitat: HabitatInput,
         db: Session = Depends(get_db)
@@ -39,7 +41,7 @@ async def create_habitat(
     saved, error = habitat_model.save(db)
 
     if saved:
-        return habitat_model
+        return saved
     else:
         return JSONResponse(
             status_code=500,
@@ -48,7 +50,7 @@ async def create_habitat(
         )
 
 
-@router.patch('/{habitat_id}')
+@router.patch('/{habitat_id}', response_model=HabitatOutput, responses={404: {'model': ErrorMessage}})
 async def update_habitat(
         habitat_id: UUID,
         habitat_payload: HabitatInput,
@@ -65,7 +67,7 @@ async def update_habitat(
     updated, error = habitat.update(db, habitat_payload.dict(exclude_none=True))
 
     if updated:
-        return {"message": "Habitat updated"}
+        return updated
     else:
         return JSONResponse(
             status_code=500,
@@ -74,7 +76,7 @@ async def update_habitat(
         )
 
 
-@router.delete('/{habitat_id}')
+@router.delete('/{habitat_id}', status_code=204, response_class=Response, responses={404: {'model': ErrorMessage}})
 async def delete_habitat(
         habitat_id: UUID,
         db: Session = Depends(get_db)
@@ -90,7 +92,7 @@ async def delete_habitat(
     deleted, error = habitat.delete(db)
 
     if deleted:
-        return {"message": "Habitat deleted"}
+        return None
     else:
         return JSONResponse(
             status_code=500,

@@ -13,3 +13,13 @@ class CommunityPatchInput(BaseModel):
     name: Optional[str]
     description: Optional[str]
     municipality_id: Optional[UUID4]
+
+
+class CommunityOutput(BaseModel):
+    id: UUID4
+    name: str
+    description: Optional[str]
+    municipality_id: UUID4
+
+    class Config:
+        orm_mode = True
