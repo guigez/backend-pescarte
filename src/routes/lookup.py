@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Query
 
 from src.database import get_db, Session
 from src.models import UF, Municipality
-from src.schemas import UFSchema, CitySchema
+from src.schemas.lookups import UFSchema, CitySchema
 
 
 router = APIRouter(prefix='/lookup')

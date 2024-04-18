@@ -1,13 +1,14 @@
 import uuid
+from typing import List
 
 from sqlalchemy import Column, String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, selectinload
 
 from src.models.base_sql_model import BaseSQLModel
 from src.models.fish_habitat import FishHabitat
 from src.models.fish_gear import FishGear
-from src.database import BaseModel
+from src.database import BaseModel, Session
 
 
 class Fish(BaseModel, BaseSQLModel):
@@ -22,3 +23,18 @@ class Fish(BaseModel, BaseSQLModel):
     gears = relationship("Gear", secondary=FishGear, back_populates="fishes")
     common_names = relationship("FishCommonNameByCommunity", back_populates="fish")
     suggested_names = relationship("SuggestedCommonNames", back_populates="fish")
+
+    @classmethod
+    def get_all(cls, db: Session) -> List["Fish"]:
+        return db.query(cls).all()
+
+    @classmethod
+    def get_by_id(cls, db: Session, fish_id: UUID) -> "Fish":
+        return db.query(cls).filter_by(id=fish_id).first()
+
+    @classmethod
+    def get_fishes_with_gears_and_habitats(cls, db: Session) -> List["Fish"]:
+        return db.query(cls).options(
+            selectinload(Fish.gears),
+            selectinload(Fish.habitats)
+        ).all()

@@ -26,3 +26,8 @@ class Gear(BaseModel, BaseSQLModel):
     @classmethod
     def get_by_id(cls, db: Session, gear_id: UUID) -> "Gear":
         return db.query(cls).filter_by(id=gear_id).first()
+
+    @classmethod
+    def get_by_ids(cls, db: Session, gear_ids: List[UUID]) -> List["Gear"]:
+        gears = db.query(cls).filter(cls.id.in_(gear_ids)).all()
+        return gears

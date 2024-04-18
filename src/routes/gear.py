@@ -6,18 +6,18 @@ from starlette.responses import JSONResponse, Response
 
 from src.database import get_db, Session
 from src.models import Gear
-from src.schemas import ErrorMessage
-from src.schemas.gear import GearInput, GearOutput
+from src.schemas.errors import ErrorMessage
+from src.schemas.gear import GearInput, GearSchema
 
 router = APIRouter(prefix='/gear')
 
 
-@router.get('/', response_model=List[GearOutput])
+@router.get('/', response_model=List[GearSchema])
 async def get_all_gears(db: Session = Depends(get_db)):
     return Gear.get_all(db)
 
 
-@router.get('/{gear_id}', response_model=GearOutput, responses={404: {'model': ErrorMessage}})
+@router.get('/{gear_id}', response_model=GearSchema, responses={404: {'model': ErrorMessage}})
 async def get_gear(
         gear_id: UUID,
         db: Session = Depends(get_db)
@@ -32,7 +32,7 @@ async def get_gear(
         )
 
 
-@router.post('/', response_model=GearOutput)
+@router.post('/', response_model=GearSchema)
 async def create_gear(
         gear: GearInput,
         db: Session = Depends(get_db)
@@ -50,7 +50,7 @@ async def create_gear(
         )
 
 
-@router.patch('/{gear_id}', response_model=GearOutput, responses={404: {'model': ErrorMessage}})
+@router.patch('/{gear_id}', response_model=GearSchema, responses={404: {'model': ErrorMessage}})
 async def update_gear(
         gear_id: UUID,
         gear_payload: GearInput,

@@ -7,17 +7,19 @@ from src.database import get_db, Session
 from src.models import SuggestedCommonNames, Community
 from src.models.suggested_common_names import SuggestedCommonNameStatus
 
-from src.routes.gear import router as gear_router
 from src.routes.community import router as community_router
+from src.routes.fish import router as fish_router
+from src.routes.gear import router as gear_router
 from src.routes.habitat import router as habitat_router
 from src.routes.lookup import router as lookup_router
 
-from src.schemas import SuggestCommonNameBody, SuggestedCommonNameResponse
+from src.schemas.common_name import SuggestCommonNameBody, SuggestedCommonNameResponse
 
 app = FastAPI(title='Catalogo Pescarte API', version='0.0.1')
 
-app.include_router(gear_router, tags=["Gear"])
 app.include_router(community_router, tags=["Community"])
+app.include_router(fish_router, tags=["Fish"])
+app.include_router(gear_router, tags=["Gear"])
 app.include_router(habitat_router, tags=["Habitat"])
 app.include_router(lookup_router, tags=["Lookups"])
 

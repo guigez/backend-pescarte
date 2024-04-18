@@ -6,7 +6,7 @@ class GearInput(BaseModel):
     name: str
 
 
-class Gear(BaseModel):
+class GearSchema(BaseModel):
     id: UUID4
     name: str
 
