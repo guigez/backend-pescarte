@@ -7,29 +7,59 @@ from starlette.responses import JSONResponse, Response
 from src.database import get_db, Session
 from src.models import Community
 from src.schemas import ErrorMessage
-from src.schemas.community import CommunityInput, CommunityPatchInput, CommunityOutput
+from src.schemas.community import CommunityInput, CommunityPatchInput, CommunityOutput, CommunityOutputWithStateAndCity
 
 router = APIRouter(prefix='/community')
 
 
-@router.get('/', response_model=List[CommunityOutput])
+@router.get('/', response_model=List[CommunityOutputWithStateAndCity])
 async def get_all_communities(db: Session = Depends(get_db)):
-    return Community.get_all(db)
+    communities = Community.get_all(db)
+
+    response = list()
+
+    for community in communities:
+        community_city = community.municipality
+        community_uf = community_city.uf_rel
+
+        community_resp = CommunityOutputWithStateAndCity(
+            id=community.id,
+            name=community.name,
+            description=community.description,
+            municipality_id=community.municipality_id,
+            municipality=community_city.name,
+            uf=community_uf.uf_name
+        )
+        response.append(community_resp)
+
+    return response
 
 
-@router.get('/{community_id}', response_model=CommunityOutput, responses={404: {'model': ErrorMessage}})
+@router.get('/{community_id}', response_model=CommunityOutputWithStateAndCity, responses={404: {'model': ErrorMessage}})
 async def get_community(
         community_id: UUID,
         db: Session = Depends(get_db)
 ):
     community = Community.get_by_id(db, community_id)
-    if community:
-        return community
-    else:
+
+    if not community:
         return JSONResponse(
             status_code=404,
             content={"message": "Community not found"}
         )
+
+    community_city = community.municipality
+    community_uf = community_city.uf_rel
+
+    response = CommunityOutputWithStateAndCity(
+        id=community.id,
+        name=community.name,
+        description=community.description,
+        municipality_id=community.municipality_id,
+        municipality=community_city.name,
+        uf=community_uf.uf_name
+    )
+    return response
 
 
 @router.post('/', response_model=CommunityOutput)

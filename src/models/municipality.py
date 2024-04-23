@@ -15,7 +15,7 @@ class Municipality(BaseModel, BaseSQLModel):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
-    uf = Column(String(255), ForeignKey('uf.uf_name'))
+    uf = Column(String(255), ForeignKey('uf.uf'))
 
     uf_rel = relationship("UF", back_populates="municipalities")
     communities = relationship("Community", back_populates="municipality")

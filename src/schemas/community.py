@@ -19,7 +19,19 @@ class CommunityOutput(BaseModel):
     id: UUID4
     name: str
     description: Optional[str]
-    municipality_id: UUID4
+    municipality_id: Optional[UUID4]
+
+    class Config:
+        orm_mode = True
+
+
+class CommunityOutputWithStateAndCity(BaseModel):
+    id: UUID4
+    name: str
+    description: Optional[str]
+    municipality_id: Optional[UUID4]
+    municipality: str
+    uf: str
 
     class Config:
         orm_mode = True

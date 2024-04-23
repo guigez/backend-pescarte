@@ -42,5 +42,5 @@ if __name__ == '__main__':
     states_csv_path = 'states.csv'  # Update with the path to your states CSV file
     cities_csv_path = 'cities.csv'  # Update with the path to your cities CSV file
 
-    # populate_states(states_csv_path)
+    populate_states(states_csv_path)
     populate_cities(cities_csv_path)
