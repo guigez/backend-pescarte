@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from fastapi import FastAPI, Depends, Query
+from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from src.database import get_db, Session
@@ -21,6 +22,20 @@ app.include_router(community_router, tags=["Community"])
 app.include_router(habitat_router, tags=["Habitat"])
 app.include_router(lookup_router, tags=["Lookups"])
 
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+]
+
+# Adicione o middleware CORS à sua aplicação FastAPI
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get('/healthcheck')
 async def health_check():
