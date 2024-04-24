@@ -5,6 +5,11 @@ from pydantic import BaseModel, UUID4, Field
 from src.schemas.gear import GearSchema
 
 
+class SuggestedNames(BaseModel):
+    community: str
+    names: List[str]
+
+
 class FishInput(BaseModel):
     scientific_name: str
     native: bool
@@ -20,6 +25,7 @@ class FishOutput(BaseModel):
 
     gears: Optional[List[GearSchema]] = Field(default=[])
     habitats: Optional[List[GearSchema]] = Field(default=[])
+    suggested_names: Optional[List[SuggestedNames]] = Field(default=[])
 
     class Config:
         orm_mode = True
