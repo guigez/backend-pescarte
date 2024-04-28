@@ -6,7 +6,7 @@ from starlette.responses import JSONResponse, Response
 
 from src.database import get_db, Session
 from src.models import Habitat
-from src.schemas import ErrorMessage
+from src.schemas.errors import ErrorMessage
 from src.schemas.habitat import HabitatInput, HabitatOutput
 
 router = APIRouter(prefix='/habitat')

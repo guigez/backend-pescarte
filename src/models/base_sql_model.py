@@ -1,3 +1,4 @@
+from typing import Tuple
 from sqlalchemy.exc import SQLAlchemyError
 
 from src.database import Session
@@ -16,12 +17,12 @@ class BaseSQLModel:
         except SQLAlchemyError as error:
             return False, ''.join(error.args)
 
-    def save(self, db: Session):
+    def save(self, db: Session) -> Tuple["BaseSQLModel", bool | str]:
         try:
             db.add(self)
             db.commit()
             db.refresh(self)
-            return self, None
+            return self, False
         except SQLAlchemyError as error:
             print(error)
             return False, ''.join(error.args)

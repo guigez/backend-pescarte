@@ -6,7 +6,7 @@ from starlette.responses import JSONResponse, Response
 
 from src.database import get_db, Session
 from src.models import Community
-from src.schemas import ErrorMessage
+from src.schemas.errors import ErrorMessage
 from src.schemas.community import CommunityInput, CommunityPatchInput, CommunityOutput, CommunityOutputWithStateAndCity
 
 router = APIRouter(prefix='/community')
