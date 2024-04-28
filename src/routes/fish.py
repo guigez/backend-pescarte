@@ -1,13 +1,14 @@
+import base64
 from uuid import UUID
 from typing import Dict, List, Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, UploadFile, File
 from starlette.responses import JSONResponse, Response
 from sqlalchemy.orm import selectinload
 
 
 from src.database import get_db, Session
-from src.models import Fish, Habitat
+from src.models import Fish, Habitat, FishImage
 from src.models.suggested_common_names import SuggestedCommonNames, SuggestedCommonNameStatus
 from src.models.gear import Gear
 from src.schemas.errors import ErrorMessage
@@ -103,11 +104,13 @@ async def get_all(
     query = query.options(selectinload(Fish.gears))
     query = query.options(selectinload(Fish.habitats))
     query = query.options(selectinload(Fish.habitats))
+    query = query.options(selectinload(Fish.image))
 
     fishes = query.all()
 
     response = list()
     for fish in fishes:
+        image_data = base64.b64encode(fish.image.image_data).decode('utf-8') if fish.image else None
         suggested_names: List[SuggestedCommonNames] = fish.suggested_names
         suggested_names_schemas = build_suggested_names(suggested_names)
         fish_output = FishOutput(
@@ -116,7 +119,8 @@ async def get_all(
             native=fish.native,
             gears=build_gears(fish.gears),
             habitats=build_habitats(fish.habitats),
-            suggested_names=suggested_names_schemas
+            suggested_names=suggested_names_schemas,
+            image_data=image_data,
         )
 
         response.append(fish_output)
@@ -176,6 +180,59 @@ async def create_fish(fish_payload: FishInput, db: Session = Depends(get_db)):
         )
 
     return fish_model
+
+
+@router.post("/{fish_id}/upload-image", status_code=201)
+async def upload_fish_image(
+    fish_id: UUID,
+    file: UploadFile = File(..., description="The image file to upload"),
+    db: Session = Depends(get_db)
+):
+    # Check if the fish exists
+    fish = db.query(Fish).filter(Fish.id == fish_id).first()
+    if not fish:
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Fish not found"}
+        )
+
+    # Read the image data
+    image_data = await file.read()
+
+    # Check if an image already exists and update or create a new one
+    fish_image = db.query(FishImage).filter(FishImage.fish_id == fish_id).first()
+    if fish_image:
+        fish_image.image_data = image_data
+        fish_image.content_type = file.content_type
+    else:
+        fish_image = FishImage(
+            fish_id=fish_id,
+            image_data=image_data,
+            content_type=file.content_type
+        )
+        db.add(fish_image)
+
+    # Commit changes to the database
+    db.commit()
+
+    return {"message": "Image uploaded successfully"}
+
+
+@router.get("/{fish_id}/image", responses={200: {"content": {"image/*": {}}}, 404: {"description": "Fish not found"}})
+async def get_fish_image(
+    fish_id: UUID,
+    db: Session = Depends(get_db)
+):
+    # Retrieve the fish image from the database
+    fish_image = db.query(FishImage).filter(FishImage.fish_id == fish_id).first()
+    if not fish_image:
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Fish image not found"}
+        )
+
+    # Return the image as a binary stream
+    return Response(content=fish_image.image_data, media_type=fish_image.content_type)
 
 
 @router.delete('/{fish_id}', status_code=204, response_class=Response, responses={404: {'model': ErrorMessage}})

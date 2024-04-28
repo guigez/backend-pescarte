@@ -17,8 +17,8 @@ CREATE TABLE suggested_common_names (
     status suggested_common_name_status DEFAULT 'PENDING',
     fish_id UUID,
     community_id UUID,
-    CONSTRAINT fk_suggested_common_names_fish FOREIGN KEY (fish_id) REFERENCES fish (id),
-    CONSTRAINT fk_suggested_common_names_community FOREIGN KEY (community_id) REFERENCES community (id)
+    CONSTRAINT fk_suggested_common_names_fish FOREIGN KEY (fish_id) REFERENCES fish (id) ON DELETE CASCADE,
+    CONSTRAINT fk_suggested_common_names_community FOREIGN KEY (community_id) REFERENCES community (id) ON DELETE CASCADE
 );
 
 -- migrate:down

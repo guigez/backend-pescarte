@@ -1,5 +1,6 @@
 from src.models.community import Community
 from src.models.fish import Fish
+from src.models.fish_image import FishImage
 from src.models.fish_common_name_by_community import FishCommonNameByCommunity
 from src.models.gear import Gear
 from src.models.habitat import Habitat

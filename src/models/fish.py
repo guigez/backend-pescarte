@@ -23,6 +23,7 @@ class Fish(BaseModel, BaseSQLModel):
     gears = relationship("Gear", secondary=FishGear, back_populates="fishes")
     common_names = relationship("FishCommonNameByCommunity", back_populates="fish")
     suggested_names = relationship("SuggestedCommonNames", back_populates="fish")
+    image = relationship("FishImage", back_populates="fish", uselist=False, cascade="all, delete-orphan")
 
     @classmethod
     def get_all(cls, db: Session) -> List["Fish"]:
