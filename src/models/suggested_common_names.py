@@ -1,12 +1,13 @@
 import uuid
 import enum
+from typing import List
 
 from sqlalchemy import Column, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 
-from src.database import BaseModel
 from src.models.base_sql_model import BaseSQLModel
+from src.database import BaseModel, Session
 
 
 class SuggestedCommonNameStatus(enum.Enum):
@@ -29,3 +30,12 @@ class SuggestedCommonNames(BaseModel, BaseSQLModel):
     # Define relationships
     fish = relationship("Fish", back_populates="suggested_names")
     community = relationship("Community", back_populates="suggested_names")
+
+    @classmethod
+    def update_status(cls, db: Session, ids: List[UUID], status: SuggestedCommonNameStatus):
+        suggested_names = db.query(cls).filter(cls.id.in_(ids)).all()
+
+        for name in suggested_names:
+            name.status = status
+
+        db.commit()

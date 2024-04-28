@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel, UUID4, validator
 import enum
 
@@ -28,3 +30,7 @@ class SuggestedCommonNameResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class SuggestedNameIdList(BaseModel):
+    ids: List[UUID4]
