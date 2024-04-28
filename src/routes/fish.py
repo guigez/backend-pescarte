@@ -176,3 +176,29 @@ async def create_fish(fish_payload: FishInput, db: Session = Depends(get_db)):
         )
 
     return fish_model
+
+
+@router.delete('/{fish_id}', status_code=204, response_class=Response, responses={404: {'model': ErrorMessage}})
+async def delete_fish(
+        fish_id: UUID,
+        db: Session = Depends(get_db)
+):
+    # TODO: Found which type should I define as the return
+    fish = Fish.get_by_id(db, fish_id)
+
+    if not fish:
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Fish not found"}
+        )
+
+    deleted, error = fish.delete(db)
+
+    if deleted:
+        return None
+    else:
+        return JSONResponse(
+            status_code=500,
+            content={"message": "Error while updating fish",
+                     "detail": error}
+        )
