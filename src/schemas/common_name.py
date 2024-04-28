@@ -7,7 +7,6 @@ import enum
 class SuggestCommonNameBody(BaseModel):
     name: str
     email: str
-    uf: str
     fish_id: UUID4
     community_id: UUID4
     suggested_name: str
