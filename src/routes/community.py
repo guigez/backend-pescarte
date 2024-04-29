@@ -1,7 +1,7 @@
 from uuid import UUID
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from starlette.responses import JSONResponse, Response
 
 from src.database import get_db, Session
@@ -13,8 +13,14 @@ router = APIRouter(prefix='/community')
 
 
 @router.get('/', response_model=List[CommunityOutputWithStateAndCity])
-async def get_all_communities(db: Session = Depends(get_db)):
-    communities = Community.get_all(db)
+async def get_all_communities(
+    db: Session = Depends(get_db),
+    municipality_id: Optional[UUID] = Query(default=None)
+):
+    if municipality_id:
+        communities = Community.get_by_municipality_id(db, municipality_id)
+    else:
+        communities = Community.get_all(db)
 
     response = list()
 

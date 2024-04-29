@@ -58,13 +58,14 @@ def build_suggested_names(suggested_names: List[SuggestedCommonNames]) -> Option
     resp = list()
 
     for suggested_name in suggested_names:
-        community_name = suggested_name.community.name
-        name = suggested_name.suggested_name
+        if suggested_name.status == SuggestedCommonNameStatus.APPROVED:
+            community_name = suggested_name.community.name
+            name = suggested_name.suggested_name
 
-        if names_grouped_by_community.get(community_name) is not None:
-            names_grouped_by_community[community_name].append(name)
-        else:
-            names_grouped_by_community[community_name] = [name]
+            if names_grouped_by_community.get(community_name) is not None:
+                names_grouped_by_community[community_name].append(name)
+            else:
+                names_grouped_by_community[community_name] = [name]
 
     for community_name, suggested_names in names_grouped_by_community.items():
         suggested_name = SuggestedNames(
@@ -135,7 +136,19 @@ async def get_fish_by_id(
 ):
     fish = Fish.get_by_id(db, fish_id)
     if fish:
-        return fish
+        image_data = base64.b64encode(fish.image.image_data).decode('utf-8') if fish.image else None
+        suggested_names: List[SuggestedCommonNames] = fish.suggested_names
+        suggested_names_schemas = build_suggested_names(suggested_names)
+        fish_output = FishOutput(
+            id=fish.id,
+            scientific_name=fish.scientific_name,
+            native=fish.native,
+            gears=build_gears(fish.gears),
+            habitats=build_habitats(fish.habitats),
+            suggested_names=suggested_names_schemas,
+            image_data=image_data,
+        )
+        return fish_output
     else:
         return JSONResponse(
             status_code=404,

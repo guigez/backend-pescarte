@@ -25,7 +25,15 @@ class Community(BaseModel, BaseSQLModel):
     @classmethod
     def get_all(cls, db: Session) -> List["Community"]:
         return db.query(cls).all()
+        
+    @classmethod
+    def get_by_id(cls, db: Session, community_id: UUID) -> "Community":
+        return db.query(cls).filter_by(id=community_id).first()
 
     @classmethod
-    def get_by_id(cls, db: Session, gear_id: UUID) -> "Community":
-        return db.query(cls).filter_by(id=gear_id).first()
+    def get_by_name_and_city(cls, db: Session, name: str, city: UUID) -> "Community":
+        return db.query(cls).filter_by(name=name, municipality_id=city).first()
+
+    @classmethod
+    def get_by_municipality_id(cls, db: Session, municipality_id: UUID) -> "Community":
+        return db.query(cls).filter(cls.municipality_id == municipality_id).all()
