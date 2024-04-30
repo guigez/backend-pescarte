@@ -22,8 +22,7 @@ app.include_router(suggested_names_router, tags=["SuggestedNames"])
 
 
 origins = [
-    "http://localhost",
-    "http://localhost:3000",
+    "*",
 ]
 
 # Adicione o middleware CORS à sua aplicação FastAPI
